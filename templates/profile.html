@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Profile - Air Draw</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
+    <link rel="stylesheet" href="/static/css/style.css" />
+  </head>
+  <body class="bg-light">
+    <nav
+      class="navbar navbar-expand-lg navbar-light bg-white nav-top mb-4 shadow-sm"
+    >
+      <div class="container-fluid px-4">
+        <span class="navbar-brand mb-0 h1">Air Draw</span>
+        <div class="d-flex gap-2">
+          <a href="/" class="btn btn-outline-primary">
+            <i class="bi bi-pencil-fill me-1"></i> Draw
+          </a>
+          <a href="/drawings" class="btn btn-outline-secondary">
+            <i class="bi bi-images me-1"></i> My Drawings
+          </a>
+          <a href="/logout" class="btn btn-outline-danger">
+            <i class="bi bi-box-arrow-right me-1"></i> Logout
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container py-4">
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, message in messages %}
+      <div
+        class="alert alert-{{ category }} alert-dismissible fade show"
+        role="alert"
+      >
+        {{ message }}
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+      {% endfor %} {% endif %} {% endwith %}
+
+      <div class="alert alert-info mb-4">
+        <div class="d-flex">
+          <div class="me-3">
+            <i class="bi bi-info-circle-fill fs-3"></i>
+          </div>
+          <div>
+            <h5 class="alert-heading">Welcome to the Air Draw!</h5>
+            <p class="mb-0">
+              This is a fun little app that uses SQLite for data storage. If you
+              cannot login in the future, the database may have been reset.
+              Simply register again and have fun!
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <!-- Left Column: Account Info -->
+        <div class="col-md-4">
+          <div class="card shadow-sm mb-4">
+            <div class="card-body">
+              <div class="text-center mb-4">
+                <div class="avatar-circle mb-3 mx-auto">
+                  <span class="avatar-initials"
+                    >{{ user.username[0] | upper }}</span
+                  >
+                </div>
+                <h3 class="h4 mb-0">{{ user.username }}</h3>
+                <p class="text-muted small">
+                  Member since {{ user.created_at.split(' ')[0] }}
+                </p>
+              </div>
+
+              <div class="d-grid">
+                <a href="/" class="btn btn-primary mb-2">
+                  <i class="bi bi-pencil-fill me-2"></i> Create New Drawing
+                </a>
+                <a href="/drawings" class="btn btn-outline-secondary">
+                  <i class="bi bi-images me-2"></i> View My Drawings ({{
+                  drawing_count }})
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="card shadow-sm">
+            <div class="card-header bg-white">
+              <h5 class="card-title mb-0">Stats</h5>
+            </div>
+            <div class="card-body">
+              <div
+                class="d-flex justify-content-between align-items-center mb-3"
+              >
+                <span>Total Drawings</span>
+                <span class="badge bg-primary rounded-pill"
+                  >{{ drawing_count }}</span
+                >
+              </div>
+              <div
+                class="d-flex justify-content-between align-items-center mb-3"
+              >
+                <span>API Status</span>
+                <span
+                  class="badge {{ user.has_api_key and 'bg-success' or 'bg-warning' }} rounded-pill"
+                >
+                  {{ user.has_api_key and 'Active' or 'Not Set' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: API Key Management -->
+        <div class="col-md-8">
+          <div class="card shadow-sm mb-4">
+            <div
+              class="card-header bg-white d-flex justify-content-between align-items-center"
+            >
+              <h5 class="card-title mb-0">Gemini API Key Management</h5>
+              <span
+                class="badge {{ user.has_api_key and 'bg-success' or 'bg-warning' }} rounded-pill"
+              >
+                {{ user.has_api_key and 'API Key Set' or 'No API Key' }}
+              </span>
+            </div>
+            <div class="card-body">
+              {% if user.has_api_key %}
+              <div class="alert alert-success">
+                <div class="d-flex">
+                  <div class="me-2">
+                    <i class="bi bi-check-circle-fill fs-4"></i>
+                  </div>
+                  <div>
+                    <h5 class="alert-heading">Your API Key is Active</h5>
+                    <p class="mb-0">
+                      Your Gemini API key is securely encrypted and will be used
+                      to analyze your drawings.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              {% else %}
+              <div class="alert alert-warning">
+                <div class="d-flex">
+                  <div class="me-2">
+                    <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+                  </div>
+                  <div>
+                    <h5 class="alert-heading">No API Key Found</h5>
+                    <p>
+                      Without a Gemini API key, your drawings will be saved but
+                      won't be analyzed by AI.
+                    </p>
+                    <hr />
+                    <p class="mb-1">To get a free API key:</p>
+                    <ol class="mb-0">
+                      <li>
+                        Go to
+                        <a
+                          href="https://aistudio.google.com/app/apikey"
+                          target="_blank"
+                          class="alert-link"
+                          >Google AI Studio</a
+                        >
+                      </li>
+                      <li>Create or sign in to your Google account</li>
+                      <li>Click "Create API key" and copy it</li>
+                    </ol>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+
+              <!-- API Key Form - Update or Add -->
+              <form
+                method="post"
+                action="{{ url_for('update_api_key') }}"
+                class="mt-4"
+                id="apiKeyForm"
+              >
+                <h5 class="mb-3">
+                  {{ user.has_api_key and 'Update' or 'Add' }} API Key
+                </h5>
+                <div class="mb-3">
+                  <label for="gemini_api_key" class="form-label"
+                    >Gemini API Key</label
+                  >
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-key-fill"></i>
+                    </span>
+                    <input
+                      type="password"
+                      class="form-control"
+                      id="gemini_api_key"
+                      name="gemini_api_key"
+                      placeholder="Enter your Gemini API key"
+                      required
+                    />
+                  </div>
+                  <div class="form-text">
+                    Your API key will be encrypted with your password and stored
+                    securely.
+                  </div>
+                </div>
+                <div class="mb-4">
+                  <label for="password" class="form-label">Your Password</label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-lock-fill"></i>
+                    </span>
+                    <input
+                      type="password"
+                      class="form-control"
+                      id="password"
+                      name="password"
+                      placeholder="Enter your password to confirm"
+                      required
+                    />
+                  </div>
+                  <div class="form-text">
+                    Your password is required to securely save your API key.
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                  <i class="bi bi-save me-1"></i>
+                  {{ user.has_api_key and 'Update' or 'Save' }} API Key
+                </button>
+              </form>
+
+              {% if user.has_api_key %}
+              <!-- Remove API Key Form -->
+              <hr class="my-4" />
+              <h5 class="text-danger mb-3">Remove API Key</h5>
+              <p>
+                If you want to remove your API key, your drawings will still be
+                saved but won't be analyzed anymore.
+              </p>
+              <button
+                type="button"
+                class="btn btn-outline-danger"
+                data-bs-toggle="modal"
+                data-bs-target="#removeApiKeyModal"
+              >
+                <i class="bi bi-trash me-1"></i> Remove API Key
+              </button>
+
+              <!-- Remove API Key Modal -->
+              <div
+                class="modal fade"
+                id="removeApiKeyModal"
+                tabindex="-1"
+                aria-labelledby="removeApiKeyModalLabel"
+                aria-hidden="true"
+              >
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="removeApiKeyModalLabel">
+                        Confirm API Key Removal
+                      </h5>
+                      <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                      ></button>
+                    </div>
+                    <div class="modal-body">
+                      <p>
+                        Are you sure you want to remove your API key? This
+                        action cannot be undone.
+                      </p>
+                      <p>
+                        After removal, your drawings will still be saved but
+                        won't be analyzed by AI.
+                      </p>
+
+                      <form
+                        method="post"
+                        action="{{ url_for('remove_api_key') }}"
+                        id="removeApiKeyForm"
+                      >
+                        <div class="mb-3">
+                          <label for="remove_password" class="form-label"
+                            >Your Password</label
+                          >
+                          <div class="input-group">
+                            <span class="input-group-text">
+                              <i class="bi bi-lock-fill"></i>
+                            </span>
+                            <input
+                              type="password"
+                              class="form-control"
+                              id="remove_password"
+                              name="password"
+                              placeholder="Enter your password to confirm"
+                              required
+                            />
+                          </div>
+                          <div class="form-text text-danger">
+                            Password verification is required for security
+                            purposes.
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                    <div class="modal-footer">
+                      <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        form="removeApiKeyForm"
+                        class="btn btn-danger"
+                      >
+                        Remove API Key
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="card shadow-sm">
+            <div class="card-header bg-white">
+              <h5 class="card-title mb-0">
+                How Gemini API Enhances Your Drawings
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-4 mb-3 mb-md-0">
+                  <div class="text-center mb-2">
+                    <i
+                      class="bi bi-eye-fill text-primary"
+                      style="font-size: 2rem"
+                    ></i>
+                  </div>
+                  <h6 class="text-center">Recognizes Objects</h6>
+                  <p class="text-center small text-muted">
+                    Identifies what you've drawn in your sketches
+                  </p>
+                </div>
+                <div class="col-md-4 mb-3 mb-md-0">
+                  <div class="text-center mb-2">
+                    <i
+                      class="bi bi-calculator text-primary"
+                      style="font-size: 2rem"
+                    ></i>
+                  </div>
+                  <h6 class="text-center">Solves Math</h6>
+                  <p class="text-center small text-muted">
+                    Can solve mathematical expressions in your drawings
+                  </p>
+                </div>
+                <div class="col-md-4">
+                  <div class="text-center mb-2">
+                    <i
+                      class="bi bi-palette-fill text-primary"
+                      style="font-size: 2rem"
+                    ></i>
+                  </div>
+                  <h6 class="text-center">Analyzes Style</h6>
+                  <p class="text-center small text-muted">
+                    Provides insights about your drawing technique
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
+
+<style>
+  .avatar-circle {
+    width: 80px;
+    height: 80px;
+    background-color: #007bff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .avatar-initials {
+    color: white;
+    font-size: 32px;
+    font-weight: bold;
+  }
+</style>
