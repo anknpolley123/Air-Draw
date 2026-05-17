@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Air Draw</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/css/style.css" />
+  </head>
+  <body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white nav-top mb-4">
+      <div class="container-fluid px-4">
+        <span class="navbar-brand mb-0 h1">Air Draw</span>
+        <div class="d-flex gap-2">
+          <a href="/" class="btn btn-outline-primary">Home</a>
+          <a href="/register" class="btn btn-outline-secondary">Register</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container py-5">
+      <div class="alert alert-info mb-4">
+        <div class="d-flex">
+          <div class="me-3">
+            <i class="bi bi-info-circle-fill fs-3"></i>
+          </div>
+          <div>
+            <h5 class="alert-heading">Welcome to the Air Draw!</h5>
+            <p class="mb-0">
+              This is a fun little app that uses SQLite for data storage. If you
+              cannot login in the future, the database may have been reset.
+              Simply register again and have fun!
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="card shadow">
+            <div class="card-body p-5">
+              <h2 class="card-title text-center mb-4">Login</h2>
+
+              {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %} {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">{{ message }}</div>
+              {% endfor %} {% endif %} {% endwith %}
+
+              <form method="post" action="{{ url_for('login') }}">
+                <div class="mb-3">
+                  <label for="username" class="form-label">Username</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="username"
+                    name="username"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="password" class="form-label">Password</label>
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="password"
+                    name="password"
+                    required
+                  />
+                </div>
+                <div class="d-grid gap-2">
+                  <button type="submit" class="btn btn-primary">Login</button>
+                  <a href="/register" class="btn btn-outline-secondary"
+                    >Create Account</a
+                  >
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
