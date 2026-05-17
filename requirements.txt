@@ -1,0 +1,12 @@
+mediapipe==0.10.18
+flask==3.1.0
+flask-socketio==5.5.1
+opencv-python==4.11.0.86
+numpy==1.26.4
+python-dotenv==1.0.1
+google-generativeai==0.8.4
+Pillow==11.0.0
+python-engineio==4.11.2
+cryptography==44.0.1
+gunicorn==23.0.0
+eventlet==0.39.0
